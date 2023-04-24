@@ -112,6 +112,7 @@ func TestNewProvider(t *testing.T) {
 		wantTokenURL      string
 		wantUserInfoURL   string
 		wantIssuerURL     string
+		wantJWKSURL       string
 		wantAlgorithms    []string
 		wantErr           bool
 	}{
@@ -126,6 +127,7 @@ func TestNewProvider(t *testing.T) {
 			}`,
 			wantAuthURL:    "https://example.com/auth",
 			wantTokenURL:   "https://example.com/token",
+			wantJWKSURL:    "https://example.com/keys",
 			wantAlgorithms: []string{"RS256"},
 		},
 		{
@@ -139,6 +141,7 @@ func TestNewProvider(t *testing.T) {
 			}`,
 			wantAuthURL:    "https://example.com/auth",
 			wantTokenURL:   "https://example.com/token",
+			wantJWKSURL:    "https://example.com/keys",
 			wantAlgorithms: []string{"RS256", "RS384", "ES256"},
 		},
 		{
@@ -154,6 +157,7 @@ func TestNewProvider(t *testing.T) {
 			}`,
 			wantAuthURL:    "https://example.com/auth",
 			wantTokenURL:   "https://example.com/token",
+			wantJWKSURL:    "https://example.com/keys",
 			wantAlgorithms: []string{"RS256", "RS384", "ES256"},
 		},
 		{
@@ -180,6 +184,7 @@ func TestNewProvider(t *testing.T) {
 			wantIssuerURL:  "https://example.com",
 			wantAuthURL:    "https://example.com/auth",
 			wantTokenURL:   "https://example.com/token",
+			wantJWKSURL:    "https://example.com/keys",
 			wantAlgorithms: []string{"RS256"},
 		},
 		{
@@ -194,6 +199,7 @@ func TestNewProvider(t *testing.T) {
 			trailingSlash:  true,
 			wantAuthURL:    "https://example.com/auth",
 			wantTokenURL:   "https://example.com/token",
+			wantJWKSURL:    "https://example.com/keys",
 			wantAlgorithms: []string{"RS256"},
 		},
 		{
@@ -203,6 +209,7 @@ func TestNewProvider(t *testing.T) {
 			wantAuthURL:     "https://accounts.google.com/o/oauth2/v2/auth",
 			wantTokenURL:    "https://oauth2.googleapis.com/token",
 			wantUserInfoURL: "https://openidconnect.googleapis.com/v1/userinfo",
+			wantJWKSURL:     "https://www.googleapis.com/oauth2/v3/certs",
 			wantAlgorithms:  []string{"RS256"},
 			data: `{
  "issuer": "ISSUER",
@@ -322,6 +329,21 @@ func TestNewProvider(t *testing.T) {
 				t.Errorf("NewProvider() unexpected algorithms value, got=%s, want=%s",
 					p.algorithms, test.wantAlgorithms)
 			}
+
+			wantCfg := &ProviderConfig{
+				IssuerURL:   p.issuer,
+				AuthURL:     test.wantAuthURL,
+				TokenURL:    test.wantTokenURL,
+				UserInfoURL: test.wantUserInfoURL,
+				JWKSURL:     test.wantJWKSURL,
+				Algorithms:  test.wantAlgorithms,
+			}
+			cfg := p.ProviderConfig()
+			if !reflect.DeepEqual(cfg, wantCfg) {
+				t.Fatalf("ProviderConfig() unexpected config value, got=%#v, want=%#v",
+					cfg, wantCfg)
+			}
+
 		})
 	}
 }

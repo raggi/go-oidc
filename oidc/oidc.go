@@ -275,6 +275,18 @@ func (p *Provider) Endpoint() oauth2.Endpoint {
 	return oauth2.Endpoint{AuthURL: p.authURL, TokenURL: p.tokenURL}
 }
 
+// ProviderConfig returns a copy of the current configuration used by this provider.
+func (p *Provider) ProviderConfig() *ProviderConfig {
+	return &ProviderConfig{
+		IssuerURL:   p.issuer,
+		AuthURL:     p.authURL,
+		TokenURL:    p.tokenURL,
+		UserInfoURL: p.userInfoURL,
+		JWKSURL:     p.jwksURL,
+		Algorithms:  p.algorithms,
+	}
+}
+
 // UserInfo represents the OpenID Connect userinfo claims.
 type UserInfo struct {
 	Subject       string `json:"sub"`
